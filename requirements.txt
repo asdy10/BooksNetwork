@@ -1,0 +1,9 @@
+fastapi
+python-dateutil
+python-dotenv
+python-jose
+python-multipart
+requests
+sqlalchemy
+psycopg2
+uvicorn
