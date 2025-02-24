@@ -26,9 +26,9 @@ services:
 
 
 
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
-    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -37,11 +37,10 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
-    container_name: kafka
     depends_on:
       - zookeeper
     ports:
-      - 29092:9092  # Пробрасываем порт 9092 на хост как 29092
+      - 29092:29092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
