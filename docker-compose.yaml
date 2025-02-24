@@ -23,59 +23,30 @@ services:
       '
     restart: always
 
+
+
+
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
-    hostname: zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
+    image: confluentinc/cp-zookeeper:7.4.4
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
 
   kafka:
-    image: confluentinc/cp-kafka:7.0.1
-    hostname: kafka
-    container_name: kafka
+    image: confluentinc/cp-kafka:7.4.4
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - 29092:29092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:SASL_PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
-      KAFKA_SUPER_USERS: User:admin
-    volumes:
-      - ./kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
-    command: >
-      bash -c "
-      echo 'Kafka is starting...' &&
-      /etc/confluent/docker/run
-      "
-
-  kafka-setup:
-    image: confluentinc/cp-kafka:7.0.1
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_BROKER: kafka:9092
-      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/kafka_client_jaas.conf
-    volumes:
-      - ./kafka_client_jaas.conf:/etc/kafka/kafka_client_jaas.conf
-    entrypoint: /bin/bash
-    command: -c "
-      echo 'Waiting for Kafka to be ready...';
-      cub kafka-ready -b kafka:9092 1 20;
-      kafka-configs --bootstrap-server kafka:9092 --alter --add-config 'SCRAM-SHA-512=[password=admin-secret]' --entity-type users --entity-name admin;
-      echo 'Kafka setup complete.';
-      exit 0;
-      "
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
