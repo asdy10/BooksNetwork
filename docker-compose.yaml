@@ -49,10 +49,9 @@ services:
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
       KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf
-    volumes:
-      - ./kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
     command: >
       sh -c '
+        mkdir -p /etc/kafka &&
         echo "KafkaServer {
           org.apache.kafka.common.security.plain.PlainLoginModule required
           username=\"${KAFKA_SASL_USERNAME}\"
