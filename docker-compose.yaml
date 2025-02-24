@@ -42,7 +42,7 @@ services:
         mkdir -p /etc/zookeeper &&
         echo "Server {
           org.apache.zookeeper.server.auth.DigestLoginModule required
-          user_${ZOOKEEPER_ADMIN_USER}=\"$ZOOKEEPER_ADMIN_PASSWORD\";
+          user_${KAFKA_SASL_USERNAME}=\"KAFKA_SASL_PASSWORD\";
         };" > /etc/zookeeper/zookeeperserver_jaas.conf &&
         exec /etc/confluent/docker/run
       '
