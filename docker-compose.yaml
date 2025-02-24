@@ -29,26 +29,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_AUTH_PROVIDER.1: org.apache.zookeeper.server.auth.SASLAuthenticationProvider
-      ZOOKEEPER_REQUIRE_CLIENT_AUTH_SCHEMES: sasl
-      ZOOKEEPER_SERVER_SASL: enable
-      JVMFLAGS: -Dzookeeper.jaas.file=/etc/zookeeper/zookeeperserver_jaas.conf
-      ZOOKEEPER_ADMIN_USER: ${KAFKA_SASL_USERNAME}
-      ZOOKEEPER_ADMIN_PASSWORD: ${KAFKA_SASL_PASSWORD}
     ports:
       - 2181:2181
-    volumes:
-      - ./zookeeper:/etc/zookeeper
-    command: >
-      sh -c '
-        mkdir -p /tmp/zookeeper &&
-        echo "Server {
-          org.apache.zookeeper.server.auth.DigestLoginModule required
-          user_${ZOOKEEPER_ADMIN_USER}=\"$ZOOKEEPER_ADMIN_PASSWORD\";
-        };" > /tmp/zookeeper/zookeeperserver_jaas.conf &&
-        mv /tmp/zookeeper/zookeeperserver_jaas.conf /etc/zookeeper/zookeeperserver_jaas.conf &&
-        exec /etc/confluent/docker/run
-      '
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -60,6 +42,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ZOOKEEPER_SASL_ENABLED: "false"
       KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://kafka:9092,SASL_PLAINTEXT_HOST://${KAFKA_ADVERTISED_HOST}:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_PLAINTEXT_HOST:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT
