@@ -31,7 +31,7 @@ services:
       RABBITMQ_DEFAULT_PASS: $RABBIT_PASSWORD
     ports:
       - "5672:5672"
-      #- "15672:15672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -45,7 +45,4 @@ volumes:
 networks:
   rabbitmq_network:
     name: rabbitmq_network
-    external: true
-  nginx_pm:
-    name: nginx_pm
     external: true
