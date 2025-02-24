@@ -35,8 +35,6 @@ services:
       JVMFLAGS: -Dzookeeper.jaas.file=/etc/zookeeper/zookeeperserver_jaas.conf
     ports:
       - 2181:2181
-    volumes:
-      - ./zookeeper:/etc/zookeeper
     command: >
       sh -c '
         mkdir -p /etc/zookeeper &&
@@ -44,7 +42,7 @@ services:
           org.apache.zookeeper.server.auth.DigestLoginModule required
           user_${KAFKA_SASL_USERNAME}=\"KAFKA_SASL_PASSWORD\";
         };" > /etc/zookeeper/zookeeperserver_jaas.conf &&
-        exec /etc/confluent/docker/run
+        /etc/confluent/docker/run
       '
 
   kafka:
