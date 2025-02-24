@@ -58,6 +58,11 @@ services:
           password=\"${KAFKA_SASL_PASSWORD}\"
           user_${KAFKA_SASL_USERNAME}=\"${KAFKA_SASL_PASSWORD}\";
         };" > /etc/kafka/kafka_server_jaas.conf &&
+        echo "Client {
+          org.apache.kafka.common.security.plain.PlainLoginModule required
+          username=\"${KAFKA_SASL_USERNAME}\"
+          password=\"${KAFKA_SASL_PASSWORD}\";
+        };" >> /etc/kafka/kafka_server_jaas.conf &&
         /etc/confluent/docker/run
       '
 
