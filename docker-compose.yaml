@@ -36,7 +36,6 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - rabbitmq_network
-      - nginx_pm
 
 volumes:
   rabbitmq_data:
