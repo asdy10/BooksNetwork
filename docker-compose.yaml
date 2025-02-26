@@ -46,8 +46,9 @@ services:
     container_name: redis-worker
     depends_on:
       - redis
-    networks:
-      - redis_net
+    links:
+      - redis
+
     env_file:
       - ./.env
 volumes:
