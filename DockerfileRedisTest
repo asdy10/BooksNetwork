@@ -6,4 +6,5 @@ COPY req2.txt .
 RUN pip install --no-cache-dir -r req2.txt
 
 COPY test_redis2.py .
+COPY .env .
 CMD ["python", "-u", "test_redis2.py"]
