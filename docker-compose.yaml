@@ -48,7 +48,8 @@ services:
       - redis
     networks:
       - redis_net
-
+    env_file:
+      - ./.env
 volumes:
   rabbitmq_data:
     driver: local
