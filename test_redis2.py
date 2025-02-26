@@ -39,15 +39,14 @@ def redis_operations():
             "value": random.randint(0, 1000)
         }
         r.set("special_key", json.dumps(new_data))
-        print('set', time.time() - t)
+        print('set1', time.time() - t)
         t = time.time()
         # Чтение 10 случайных ключей
-        for _ in range(10):
+        for _ in range(100):
             key = f"key_{random.randint(0, 9999)}"
             data = r.get(key)
-            print(f"Read {key}: {data[:30]}..." if data else f"{key} not found")
 
-        print('set many', time.time() - t)
+        print('get many', time.time() - t)
         time.sleep(INTERVAL)
 
         # except redis.RedisError as e:
