@@ -22,6 +22,8 @@ services:
         redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
       '
     restart: always
+    networks:
+      - redis_net
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -35,13 +37,26 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
-      - rabbitmq_network
+      - rabbitmq_net
+
+  redis-worker:
+    build:
+      context: .
+      dockerfile: DockerfileRedisTest
+    container_name: redis-worker
+    depends_on:
+      - redis
+    networks:
+      - redis_net
 
 volumes:
   rabbitmq_data:
     driver: local
 
 networks:
-  rabbitmq_network:
-    name: rabbitmq_network
+  rabbitmq_net:
+    name: rabbitmq_net
+    external: true
+  redis_net:
+    name: redis_net
     external: true
