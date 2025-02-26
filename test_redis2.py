@@ -56,5 +56,7 @@ def redis_operations():
             time.sleep(5)
 
 
+print('init')
 if __name__ == "__main__":
+    print('start')
     redis_operations()
