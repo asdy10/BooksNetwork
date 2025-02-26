@@ -15,6 +15,7 @@ INTERVAL = int(os.getenv('WORKER_INTERVAL', 10))  # 60 seconds by default
 
 
 def redis_operations():
+    print('start redis_operations')
     r = redis.Redis(
         host=REDIS_HOST,
         port=REDIS_PORT,
@@ -23,6 +24,7 @@ def redis_operations():
         password=REDIS_USER_PASSWORD,
         decode_responses=True
     )
+    print('connection success')
 
     while True:
         try:
