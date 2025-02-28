@@ -6,8 +6,11 @@ while True:
 
     t = time.time()
     # Чтение 10 случайных ключей
-    for _ in range(100):
-        res = requests.get('http://api-worker:8000/get')
+    res = requests.get('http://api-worker:8000/get_many')
+    print('get many1', time.time() - t)
+    t = time.time()
+    for _ in range(10):
+        res = requests.get('http://api-worker:8000/get_many')
 
-    print('get many', time.time() - t)
+    print('get many2', time.time() - t)
     time.sleep(10)
