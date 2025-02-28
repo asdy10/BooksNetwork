@@ -39,39 +39,39 @@ services:
     networks:
       - rabbitmq_net
 
-#  redis-worker:
+  redis-worker:
+    build:
+      context: .
+      dockerfile: DockerfileRedisTest
+    container_name: redis-worker
+    depends_on:
+      - redis
+    networks:
+      - redis_net
+    env_file:
+      - ./.env
+#  api-worker:
 #    build:
 #      context: .
-#      dockerfile: DockerfileRedisTest
-#    container_name: redis-worker
-#    depends_on:
-#      - redis
+#      dockerfile: DockerfileApiTest
+#    container_name: api-worker
+#
 #    networks:
-#      - redis_net
+#      - nginx_pm
+#
 #    env_file:
 #      - ./.env
-  api-worker:
-    build:
-      context: .
-      dockerfile: DockerfileApiTest
-    container_name: api-worker
-
-    networks:
-      - nginx_pm
-
-    env_file:
-      - ./.env
-  api-worker2:
-    build:
-      context: .
-      dockerfile: DockerfileApiTest2
-    container_name: api-worker2
-
-    networks:
-      - nginx_pm
-
-    env_file:
-      - ./.env
+#  api-worker2:
+#    build:
+#      context: .
+#      dockerfile: DockerfileApiTest2
+#    container_name: api-worker2
+#
+#    networks:
+#      - nginx_pm
+#
+#    env_file:
+#      - ./.env
 volumes:
   rabbitmq_data:
     driver: local

@@ -45,10 +45,14 @@ def redis_operations():
         for _ in range(100):
             key = f"key_{random.randint(0, 9999)}"
             data = r.get(key)
-        r.get
-        print('get many', time.time() - t)
-        time.sleep(INTERVAL)
 
+
+        print('get many', time.time() - t)
+        t = time.time()
+        keys = [f"key_{random.randint(0, 9999)}" for i in range(10000)]
+        data = r.mget(keys)
+        print('get many2', time.time() - t)
+        time.sleep(INTERVAL)
         # except redis.RedisError as e:
         #     print(f"Redis error: {e}")
         #     time.sleep(5)
