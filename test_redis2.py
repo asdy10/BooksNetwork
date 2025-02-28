@@ -45,7 +45,7 @@ def redis_operations():
         for _ in range(100):
             key = f"key_{random.randint(0, 9999)}"
             data = r.get(key)
-
+        r.get
         print('get many', time.time() - t)
         time.sleep(INTERVAL)
 

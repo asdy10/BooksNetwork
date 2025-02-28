@@ -1,4 +1,6 @@
 import os
+import uuid
+from datetime import datetime
 
 import redis
 import pika
@@ -45,32 +47,61 @@ class BaseClient:
         }
         self.channel.basic_publish(exchange='',routing_key=RABBITMQ_QUEUE, body=json.dumps(message))
 
-    def update_user(self, user_id, name=None, email=None):
-        """Обновляет пользователя в Redis и отправляет событие в RabbitMQ."""
-        user_data = self.redis.get(f'user:{user_id}')
-        if not user_data:
-            raise ValueError(f"User {user_id} not found")
+    def get(self, item_id):
+        """Получает элемент из Redis."""
+        item_data = self.redis.get(f'{self.model_name()}:{item_id}')
+        if not item_data:
+            raise ValueError(f"{self.model_name()} {item_id} not found")
+        return json.loads(item_data)
 
-        user_data = json.loads(user_data)
-        if name:
-            user_data['name'] = name
-        if email:
-            user_data['email'] = email
+    def create(self, data):
+        """Создает новый элемент в Redis и отправляет событие в RabbitMQ."""
+        item_id = data.get('id', str(uuid.uuid4()))
+        data['created_at'] = datetime.now().isoformat()
+        data['updated_at'] = data['created_at']
+        
+        self.redis.set(f'{self.model_name()}:{item_id}', json.dumps(data))
+        self.send_action('create', data)
+        return item_id
 
-        # Обновляем в Redis
-        self.redis.set(f'user:{user_id}', json.dumps(user_data))
+    def update(self, item_id, **kwargs):
+        """Обновляет элемент в Redis и отправляет событие в RabbitMQ."""
+        item_data = self.get(item_id)
+        
+        # Обновляем только переданные поля
+        for key, value in kwargs.items():
+            if value is not None:
+                item_data[key] = value
+        
+        item_data['updated_at'] = datetime.now().isoformat()
+        
+        self.redis.set(f'{self.model_name()}:{item_id}', json.dumps(item_data))
+        self.send_action('update', {'id': item_id, **kwargs})
 
-        # Отправляем событие в RabbitMQ
-        self.send_action('update_user', {'id': user_id, 'name': name, 'email': email})
+    def delete(self, item_id):
+        """Удаляет элемент из Redis и отправляет событие в RabbitMQ."""
+        if not self.redis.exists(f'{self.model_name()}:{item_id}'):
+            raise ValueError(f"{self.model_name()} {item_id} not found")
 
-    def add_many(self, users, chunk_size=100):
-        """Добавляет много пользователей в Redis и отправляет событие в RabbitMQ."""
-        for i in range(0, len(users), chunk_size):
-            chunk = users[i:i + chunk_size]
-            for user in chunk:
-                self.redis.set(f'user:{user["id"]}', json.dumps(user))
+        self.redis.delete(f'{self.model_name()}:{item_id}')
+        self.send_action('delete', {'id': item_id})
+
+    def add_many(self, items, chunk_size=100):
+        """Добавляет много элементов в Redis и отправляет событие в RabbitMQ."""
+        for i in range(0, len(items), chunk_size):
+            chunk = items[i:i + chunk_size]
+            for item in chunk:
+                item_id = item.get('id', str(uuid.uuid4()))
+                item['created_at'] = datetime.now().isoformat()
+                item['updated_at'] = item['created_at']
+                self.redis.set(f'{self.model_name()}:{item_id}', json.dumps(item))
             self.send_action('add_many', chunk)
 
     def close(self):
         """Закрывает соединение с RabbitMQ."""
         self.connection.close()
+
+
+class BookClient(BaseClient):
+    def model_name(self):
+        return 'book'

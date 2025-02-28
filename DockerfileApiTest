@@ -1,0 +1,6 @@
+FROM python:3.10
+RUN pip install --upgrade pip
+COPY req2.txt requirements.txt
+RUN pip install -r requirements.txt && chmod 755 .
+COPY test_fastapi.py .
+CMD ["python", "-u", "test_fastapi.py"]
